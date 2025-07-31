@@ -145,6 +145,7 @@ const LossFrame = () => {
           </button>
         </motion.div>
       </motion.div>
+      </div>
     </div>
   );
 };
