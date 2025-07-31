@@ -1,9 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Helvetica+Neue:wght@300;400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Arial', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Helvetica Neue', 'Helvetica', sans-serif;
+  font-weight: 700;
+}
+
+.subheader {
+  font-family: 'Helvetica Neue', 'Helvetica', sans-serif;
+  font-weight: 400;
 }

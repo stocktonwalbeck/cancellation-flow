@@ -30,10 +30,21 @@ export const CancellationProvider = ({ children }) => {
     setCancellationData(prev => ({ ...prev, ...data }));
   };
 
+  const resetCancellationFlow = () => {
+    setCancellationData({
+      reason: '',
+      customReason: '',
+      currentStep: 1,
+      offersShown: [],
+      offersAccepted: []
+    });
+  };
+
   const value = {
     userData,
     cancellationData,
-    updateCancellationData
+    updateCancellationData,
+    resetCancellationFlow
   };
 
   return (

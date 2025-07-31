@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useCancellation } from '../context/CancellationContext';
-import { CheckCircle, ArrowRight } from 'lucide-react';
+import { CheckCircle, ArrowRight, ChevronLeft } from 'lucide-react';
 
 const TailoredOffer = () => {
   const navigate = useNavigate();
@@ -69,6 +69,22 @@ const TailoredOffer = () => {
 
   const currentOffer = offers[cancellationData.reason] || offers["other"];
 
+  // Get the appropriate graphic for the offer
+  const getOfferImage = (offerType) => {
+    if (offerType.includes("30-Day") || offerType.includes("Extension")) {
+      return "https://storage.googleapis.com/msgsndr/c2DjRsOo4e13Od6ZTU6S/media/688ae65908dbc36d6924684e.png";
+    }
+    if (offerType.includes("50%") || offerType.includes("50 %")) {
+      return "https://storage.googleapis.com/msgsndr/c2DjRsOo4e13Od6ZTU6S/media/688ae659ba7d04807e2d080f.png";
+    }
+    if (offerType.includes("Park") || offerType.includes("$29")) {
+      return "https://storage.googleapis.com/msgsndr/c2DjRsOo4e13Od6ZTU6S/media/688ae659a4c55f719b54a1b5.png";
+    }
+    return null;
+  };
+
+  const offerImage = getOfferImage(currentOffer.type);
+
   const handleAcceptOffer = () => {
     updateCancellationData({ 
       offersAccepted: [...cancellationData.offersAccepted, currentOffer.type]
@@ -86,13 +102,27 @@ const TailoredOffer = () => {
     navigate('/cancel/step-4');
   };
 
+  const handleGoHome = () => {
+    window.location.href = 'https://app.coursecreator360.com';
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-2xl w-full bg-white rounded-2xl shadow-xl p-8"
+        className="max-w-2xl w-full bg-cc360-site-white rounded-2xl shadow-xl p-8"
       >
+        {/* Home Button */}
+        <div className="mb-6">
+          <button
+            onClick={handleGoHome}
+            className="flex items-center space-x-2 px-3 py-2 text-gray-600 hover:text-gray-800 font-body text-sm transition-all duration-200 rounded-lg hover:bg-gray-50"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            <span>Home</span>
+          </button>
+        </div>
         {/* Offer Icon */}
         <motion.div 
           initial={{ scale: 0 }}
@@ -100,7 +130,7 @@ const TailoredOffer = () => {
           transition={{ delay: 0.2, type: "spring" }}
           className="flex justify-center mb-6"
         >
-          <div className="w-16 h-16 bg-gradient-to-r from-green-400 to-green-600 rounded-full flex items-center justify-center">
+          <div className="w-16 h-16 bg-gradient-to-r from-cc360-primary to-cc360-blue rounded-full flex items-center justify-center">
             <CheckCircle className="w-8 h-8 text-white" />
           </div>
         </motion.div>
@@ -111,7 +141,7 @@ const TailoredOffer = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
-            className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"
+            className="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-4"
           >
             {currentOffer.headline}
           </motion.h1>
@@ -119,7 +149,7 @@ const TailoredOffer = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="text-lg text-gray-600 leading-relaxed"
+            className="text-lg text-gray-600 font-subheading leading-relaxed"
           >
             {currentOffer.subCopy}
           </motion.p>
@@ -130,15 +160,17 @@ const TailoredOffer = () => {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.5 }}
-          className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6 mb-8"
+          className="rounded-xl mb-8"
         >
           <div className="text-center">
-            <h3 className="text-xl font-bold text-green-800 mb-2">
-              Special Retention Offer
-            </h3>
-            <p className="text-green-700 font-medium">
-              {currentOffer.type}
-            </p>
+            <img 
+              src={offerImage} 
+              alt={currentOffer.type}
+              className="w-full max-w-lg mx-auto rounded-lg shadow-lg"
+              onError={(e) => {
+                e.target.style.display = 'none';
+              }}
+            />
           </div>
         </motion.div>
 
@@ -151,14 +183,14 @@ const TailoredOffer = () => {
         >
           <button
             onClick={handleAcceptOffer}
-            className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg"
+            className="w-full bg-gradient-to-r from-cc360-primary to-cc360-blue hover:from-blue-600 hover:to-cc360-blue text-white font-heading font-bold py-4 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg"
           >
             {currentOffer.acceptCTA}
           </button>
           
           <button
             onClick={handleRejectOffer}
-            className="w-full bg-transparent hover:bg-gray-50 text-gray-600 hover:text-gray-800 font-medium py-4 px-6 rounded-lg border border-gray-300 transition-all duration-200 flex items-center justify-center space-x-2"
+            className="w-full bg-transparent hover:bg-gray-50 text-gray-600 hover:text-gray-800 font-body font-medium py-4 px-6 rounded-lg border border-gray-300 transition-all duration-200 flex items-center justify-center space-x-2"
           >
             <span>{currentOffer.rejectCTA}</span>
             <ArrowRight className="w-4 h-4" />
