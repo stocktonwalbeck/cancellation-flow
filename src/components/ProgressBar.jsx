@@ -16,6 +16,7 @@ const ProgressBar = ({ currentStep, totalSteps = 4 }) => {
   };
 
   const activeStep = getActiveStep(currentStep);
+  const completedSteps = activeStep - 1; // Number of fully completed steps
 
   return (
     <div className="w-full px-4 py-6">
@@ -23,28 +24,36 @@ const ProgressBar = ({ currentStep, totalSteps = 4 }) => {
         <div className="flex items-center justify-between">
           {[...Array(totalSteps)].map((_, index) => {
             const stepNumber = index + 1;
-            const isActive = stepNumber <= activeStep;
+            const isActive = stepNumber === activeStep;
             const isCompleted = stepNumber < activeStep;
+            const lineIndex = index; // Line after this dot
+            const isLineCompleted = lineIndex < completedSteps;
             
             return (
               <React.Fragment key={stepNumber}>
                 {/* Progress Dot */}
                 <motion.div
                   animate={{ 
-                    scale: isActive ? 1.1 : 1,
-                    backgroundColor: isActive ? '#0475FF' : '#E5E7EB'
+                    scale: (isActive || isCompleted) ? 1.1 : 1,
+                    backgroundColor: (isActive || isCompleted) ? '#0475FF' : '#E5E7EB'
                   }}
-                  transition={{ duration: 0.4, ease: "easeInOut" }}
+                  transition={{ 
+                    duration: 0.5, 
+                    ease: "easeOut",
+                    delay: isActive ? 0.8 : 0 // Dot activates after line finishes
+                  }}
                   className={`relative w-4 h-4 rounded-full ${
-                    isActive ? 'bg-cc360-primary' : 'bg-gray-300'
+                    (isActive || isCompleted) ? 'bg-cc360-primary' : 'bg-gray-300'
                   }`}
                 >
                   {/* Active dot inner glow */}
-                  {isActive && (
+                  {(isActive || isCompleted) && (
                     <motion.div
                       animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.5 }}
-                      transition={{ duration: 0.4 }}
+                      transition={{ 
+                        duration: 0.3,
+                        delay: isActive ? 0.8 : 0 
+                      }}
                       className="absolute inset-0 rounded-full bg-cc360-primary opacity-30 scale-150"
                     />
                   )}
@@ -55,12 +64,11 @@ const ProgressBar = ({ currentStep, totalSteps = 4 }) => {
                   <div className="flex-1 h-0.5 mx-2 bg-gray-300 relative overflow-hidden">
                     <motion.div
                       animate={{ 
-                        width: isCompleted ? '100%' : '0%' 
+                        width: isLineCompleted ? '100%' : '0%' 
                       }}
                       transition={{ 
-                        duration: 0.6, 
-                        ease: "easeInOut",
-                        delay: isCompleted ? 0.2 : 0
+                        duration: 0.8, // Slow, smooth line fill
+                        ease: "easeInOut"
                       }}
                       className="h-full bg-cc360-primary"
                     />
