@@ -201,7 +201,6 @@ const TailoredOffer = () => {
           </button>
         </motion.div>
       </motion.div>
-      </div>
     </div>
   );
 };

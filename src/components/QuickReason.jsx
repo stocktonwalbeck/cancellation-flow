@@ -185,7 +185,6 @@ const QuickReason = () => {
           </button>
         </motion.div>
       </motion.div>
-      </div>
     </div>
   );
 };

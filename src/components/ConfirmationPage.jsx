@@ -124,7 +124,6 @@ const ConfirmationPage = () => {
           </motion.div>
         </motion.div>
       </motion.div>
-      </div>
     </div>
   );
 };
