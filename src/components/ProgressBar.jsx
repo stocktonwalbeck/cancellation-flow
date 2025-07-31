@@ -52,6 +52,22 @@ const ProgressBar = ({ currentStep, totalSteps = 4 }) => {
                     isDotActive ? 'bg-cc360-primary' : 'bg-gray-300'
                   }`}
                 >
+                  {/* Current step pulsating animation */}
+                  {stepNumber === activeStep && (
+                    <motion.div
+                      animate={{ 
+                        scale: [1, 1.3, 1],
+                        opacity: [0.5, 0.8, 0.5]
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                      className="absolute inset-0 rounded-full bg-cc360-primary opacity-50"
+                    />
+                  )}
+                  
                   {/* Active dot inner glow */}
                   {isDotActive && (
                     <motion.div
@@ -69,6 +85,8 @@ const ProgressBar = ({ currentStep, totalSteps = 4 }) => {
                 {index < totalSteps - 1 && (
                   <div className="flex-1 h-0.5 mx-2 bg-gray-300 relative overflow-hidden">
                     <motion.div
+                      key={lineTargetStep === activeStep ? `animating-${index}-${activeStep}` : `static-${index}`}
+                      initial={{ width: isLineFilled ? '100%' : '0%' }}
                       animate={{ 
                         width: isLineFilled ? '100%' : '0%' 
                       }}
