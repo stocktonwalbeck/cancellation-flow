@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { CheckCircle, RotateCcw, ChevronLeft } from 'lucide-react';
 import { useCancellation } from '../context/CancellationContext';
+import ProgressBar from './ProgressBar';
 
 const ConfirmationPage = () => {
   const navigate = useNavigate();
@@ -35,12 +36,16 @@ const ConfirmationPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-cc360-fade">
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="max-w-lg w-full bg-cc360-site-white rounded-2xl shadow-xl p-8 text-center"
-      >
+    <div className="min-h-screen p-4 bg-cc360-fade">
+      {/* Progress Bar */}
+      <ProgressBar currentStep={6} />
+      
+      <div className="flex items-center justify-center min-h-[calc(100vh-120px)]">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="max-w-lg w-full bg-cc360-site-white rounded-2xl shadow-xl p-8 text-center"
+        >
         {/* Home Button */}
         <div className="mb-6">
           <button
@@ -119,6 +124,7 @@ const ConfirmationPage = () => {
           </motion.div>
         </motion.div>
       </motion.div>
+      </div>
     </div>
   );
 };

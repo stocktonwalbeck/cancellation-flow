@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useCancellation } from '../context/CancellationContext';
 import { ArrowRight, ChevronLeft } from 'lucide-react';
+import ProgressBar from './ProgressBar';
 
 const QuickReason = () => {
   const navigate = useNavigate();
@@ -47,12 +48,16 @@ const QuickReason = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-2xl w-full bg-cc360-site-white rounded-2xl shadow-xl p-8"
-      >
+    <div className="min-h-screen p-4">
+      {/* Progress Bar */}
+      <ProgressBar currentStep={2} />
+      
+      <div className="flex items-center justify-center min-h-[calc(100vh-120px)]">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-2xl w-full bg-cc360-site-white rounded-2xl shadow-xl p-8"
+        >
         {/* Home Button */}
         <div className="mb-6">
           <button
@@ -180,6 +185,7 @@ const QuickReason = () => {
           </button>
         </motion.div>
       </motion.div>
+      </div>
     </div>
   );
 };

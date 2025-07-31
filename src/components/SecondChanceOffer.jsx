@@ -106,12 +106,16 @@ const SecondChanceOffer = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-2xl w-full bg-cc360-site-white rounded-2xl shadow-xl p-8"
-      >
+    <div className="min-h-screen p-4">
+      {/* Progress Bar */}
+      <ProgressBar currentStep={4} />
+      
+      <div className="flex items-center justify-center min-h-[calc(100vh-120px)]">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-2xl w-full bg-cc360-site-white rounded-2xl shadow-xl p-8"
+        >
         {/* Home Button */}
         <div className="mb-6">
           <button
@@ -207,6 +211,7 @@ const SecondChanceOffer = () => {
           </button>
         </motion.div>
       </motion.div>
+      </div>
     </div>
   );
 };
