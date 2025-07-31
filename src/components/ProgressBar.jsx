@@ -73,7 +73,7 @@ const ProgressBar = ({ currentStep, totalSteps = 4 }) => {
                         width: isLineFilled ? '100%' : '0%' 
                       }}
                       transition={{ 
-                        duration: isLineFilled && lineTargetStep === activeStep ? 0.8 : 0,
+                        duration: lineTargetStep === activeStep ? 0.8 : 0,
                         ease: "easeInOut"
                       }}
                       className="h-full bg-cc360-primary"
