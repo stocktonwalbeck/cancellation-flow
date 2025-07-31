@@ -69,13 +69,11 @@ const ProgressBar = ({ currentStep, totalSteps = 4 }) => {
                 {index < totalSteps - 1 && (
                   <div className="flex-1 h-0.5 mx-2 bg-gray-300 relative overflow-hidden">
                     <motion.div
-                      key={`line-${index}-${activeStep}`}
-                      initial={{ width: '0%' }}
                       animate={{ 
                         width: isLineFilled ? '100%' : '0%' 
                       }}
                       transition={{ 
-                        duration: 0.8,
+                        duration: isLineFilled && lineTargetStep === activeStep ? 0.8 : 0,
                         ease: "easeInOut"
                       }}
                       className="h-full bg-cc360-primary"
