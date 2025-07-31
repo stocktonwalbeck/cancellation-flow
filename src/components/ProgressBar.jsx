@@ -28,13 +28,15 @@ const ProgressBar = ({ currentStep, totalSteps = 4 }) => {
             // Only current and previous steps should be blue
             const isDotActive = stepNumber <= activeStep;
             
-            // Only lines that connect completed dots should be blue
-            // Line after dot 1 fills when moving to step 2, etc.
-            const lineConnectsToNext = index + 1; // This line goes to step (index + 2)
-            const shouldLineFill = lineConnectsToNext < activeStep;
+            // Line logic: line after dot N should be filled when we reach step N+1
+            // Line 0 (after dot 1) fills when activeStep >= 2
+            // Line 1 (after dot 2) fills when activeStep >= 3, etc.
+            const lineAfterThisDot = index; // Line index
+            const lineTargetStep = lineAfterThisDot + 2; // Step when this line should be filled
+            const isLineFilled = activeStep >= lineTargetStep;
             
             return (
-              <React.Fragment key={stepNumber}>
+              <React.Fragment key={`step-${stepNumber}`}>
                 {/* Progress Dot */}
                 <motion.div
                   animate={{ 
@@ -44,7 +46,7 @@ const ProgressBar = ({ currentStep, totalSteps = 4 }) => {
                   transition={{ 
                     duration: 0.5, 
                     ease: "easeOut",
-                    delay: stepNumber === activeStep ? 0.8 : 0 // Current dot activates after line
+                    delay: stepNumber === activeStep ? 0.8 : 0
                   }}
                   className={`relative w-4 h-4 rounded-full ${
                     isDotActive ? 'bg-cc360-primary' : 'bg-gray-300'
@@ -67,14 +69,17 @@ const ProgressBar = ({ currentStep, totalSteps = 4 }) => {
                 {index < totalSteps - 1 && (
                   <div className="flex-1 h-0.5 mx-2 bg-gray-300 relative overflow-hidden">
                     <motion.div
+                      key={`line-${index}-${activeStep}`}
+                      initial={{ width: '0%' }}
                       animate={{ 
-                        width: shouldLineFill ? '100%' : '0%' 
+                        width: isLineFilled ? '100%' : '0%' 
                       }}
                       transition={{ 
                         duration: 0.8,
                         ease: "easeInOut"
                       }}
                       className="h-full bg-cc360-primary"
+                      style={{ transformOrigin: 'left' }}
                     />
                   </div>
                 )}
