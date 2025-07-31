@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useCancellation } from '../context/CancellationContext';
-import { ArrowRight, ChevronLeft } from 'lucide-react';
 import ProgressBar from './ProgressBar';
+import { ArrowRight, ChevronLeft } from 'lucide-react';
 
 const QuickReason = () => {
   const navigate = useNavigate();

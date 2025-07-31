@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useCancellation } from '../context/CancellationContext';
+import ProgressBar from './ProgressBar';
 import { Heart, ArrowRight, ChevronLeft } from 'lucide-react';
 
 const SecondChanceOffer = () => {
