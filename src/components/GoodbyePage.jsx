@@ -139,6 +139,7 @@ const GoodbyePage = () => {
                 value={tempLocationId}
                 onChange={(e) => setTempLocationId(e.target.value)}
                 placeholder="locationId"
+                data-testid="test-location-id"
                 className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-cc360-primary focus:border-transparent text-sm"
               />
             </div>
@@ -148,6 +149,7 @@ const GoodbyePage = () => {
                 value={tempCompanyId}
                 onChange={(e) => setTempCompanyId(e.target.value)}
                 placeholder="companyId"
+                data-testid="test-company-id"
                 className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-cc360-primary focus:border-transparent text-sm"
               />
             </div>
@@ -156,6 +158,7 @@ const GoodbyePage = () => {
             <button
               onClick={() => updateUserData({ locationId: tempLocationId, companyId: tempCompanyId })}
               className="px-3 py-2 bg-gray-800 text-white rounded-md text-sm hover:bg-gray-900"
+              data-testid="apply-ids"
             >
               Use IDs
             </button>
