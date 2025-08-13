@@ -69,9 +69,21 @@ Ready for integration with:
 ## Customization
 
 - Edit user data in `src/context/CancellationContext.jsx`
-- Modify offers in component files
+- Modify offers in `src/config/offers.js`
 - Update styling in Tailwind classes
 - Add new retention strategies as needed
+
+## Environment
+
+Create a `.env` by copying `.env.example`:
+
+```
+cp .env.example .env
+```
+
+Available variables:
+- `VITE_APP_URL` – Base app URL used by the Home buttons
+- `VITE_DASHBOARD_URL` – Destination after accepting an offer
 
 ## License
 

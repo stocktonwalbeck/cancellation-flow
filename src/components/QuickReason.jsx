@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { useCancellation } from '../context/CancellationContext';
-import ProgressBar from './ProgressBar';
-import { ArrowRight, ChevronLeft } from 'lucide-react';
+import CancelLayout from './CancelLayout';
+import { ArrowRight } from 'lucide-react';
+import { REASONS } from '../config/reasons';
+import { trackEvent, trackPage } from '../utils/analytics';
 
 const QuickReason = () => {
   const navigate = useNavigate();
@@ -11,75 +13,56 @@ const QuickReason = () => {
   const [selectedReason, setSelectedReason] = useState('');
   const [customReason, setCustomReason] = useState('');
   const [randomizedReasons, setRandomizedReasons] = useState([]);
+  const prefersReducedMotion = useReducedMotion();
+  const headingRef = useRef(null);
 
-  const reasons = [
-    "No time to use it",
-    "I was just testing the platform", 
-    "Hard To Learn / Too Complicated",
-    "No sales yet / too costly",
-    "Bugs or performance issues",
-    "Poor customer service",
-    "Missing a feature I need"
-  ];
+  const reasonOptions = useMemo(() => REASONS.filter(r => r.code !== 'OTHER'), []);
 
   // Randomize reasons on component mount to avoid chronology bias
   useEffect(() => {
-    const shuffled = [...reasons].sort(() => Math.random() - 0.5);
+    document.title = 'Cancel CC360 – Step 2';
+    trackPage('Cancellation – Step 2 (QuickReason)');
+    const shuffled = [...reasonOptions].sort(() => Math.random() - 0.5);
     setRandomizedReasons(shuffled);
-  }, []);
+    if (headingRef.current) headingRef.current.focus();
+  }, [reasonOptions]);
 
   const handleNext = () => {
     if (!selectedReason) return;
     
     updateCancellationData({ 
       reason: selectedReason,
-      customReason: selectedReason === 'other' ? customReason : '',
+      customReason: selectedReason === 'OTHER' ? customReason : '',
       currentStep: 3 
     });
+    trackEvent('cancellation_reason_selected', { reasonCode: selectedReason, hasCustom: !!customReason });
     navigate('/cancel/step-3');
   };
 
-  const handleReasonSelect = (reason) => {
-    setSelectedReason(reason);
-  };
-
-  const handleGoHome = () => {
-    window.location.href = 'https://app.coursecreator360.com';
+  const handleReasonSelect = (code) => {
+    setSelectedReason(code);
   };
 
   return (
-    <div className="min-h-screen p-4">
-      {/* Progress Bar */}
-      <ProgressBar currentStep={2} />
-      
-      <div className="flex items-center justify-center min-h-[calc(100vh-120px)]">
+    <CancelLayout step={2}>
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-2xl w-full bg-cc360-site-white rounded-2xl shadow-xl p-8"
         >
-        {/* Home Button */}
-        <div className="mb-6">
-          <button
-            onClick={handleGoHome}
-            className="flex items-center space-x-2 px-3 py-2 text-gray-600 hover:text-gray-800 font-body text-sm transition-all duration-200 rounded-lg hover:bg-gray-50"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            <span>Home</span>
-          </button>
-        </div>
         {/* Header */}
         <div className="text-center mb-8">
           <motion.h1 
-            initial={{ opacity: 0 }}
+            initial={prefersReducedMotion ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-4"
+            className="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-4 focus:outline-none"
+            tabIndex={-1}
+            ref={headingRef}
           >
             Two clicks, tops: why are you thinking of leaving?
           </motion.h1>
           <motion.p 
-            initial={{ opacity: 0 }}
+            initial={prefersReducedMotion ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
             className="text-lg text-gray-600 font-subheading"
@@ -89,71 +72,87 @@ const QuickReason = () => {
         </div>
 
         {/* Reason Options */}
-        <motion.div 
-          initial={{ opacity: 0 }}
+        <motion.fieldset 
+          role="radiogroup"
+          aria-label="Cancellation reason"
+          initial={prefersReducedMotion ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
           className="space-y-3 mb-8"
         >
-          {randomizedReasons.map((reason, index) => (
-            <motion.button
-              key={reason}
-              initial={{ opacity: 0, x: -20 }}
+          {randomizedReasons.map((r, index) => (
+            <motion.label
+              key={r.code}
+              initial={prefersReducedMotion ? false : { opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.5 + index * 0.1 }}
-              onClick={() => handleReasonSelect(reason)}
-              className={`w-full p-4 text-left rounded-lg border-2 transition-all duration-200 ${
-                selectedReason === reason
+              transition={{ delay: prefersReducedMotion ? 0 : 0.5 + index * 0.1 }}
+              className={`w-full p-4 text-left rounded-lg border-2 transition-all duration-200 cursor-pointer ${
+                selectedReason === r.code
                   ? 'border-cc360-primary bg-cc360-primary/10 text-cc360-blue'
                   : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
               }`}
             >
+              <input
+                type="radio"
+                name="reason"
+                value={r.code}
+                checked={selectedReason === r.code}
+                onChange={() => handleReasonSelect(r.code)}
+                className="sr-only"
+              />
               <div className="flex items-center space-x-3">
                 <div className={`w-4 h-4 rounded-full border-2 ${
-                  selectedReason === reason
+                  selectedReason === r.code
                     ? 'border-cc360-primary bg-cc360-primary'
                     : 'border-gray-300'
                 }`}>
-                  {selectedReason === reason && (
+                  {selectedReason === r.code && (
                     <div className="w-2 h-2 bg-white rounded-full mx-auto mt-0.5"></div>
                   )}
                 </div>
-                <span className="font-body font-medium">{reason}</span>
+                <span className="font-body font-medium">{r.label}</span>
               </div>
-            </motion.button>
+            </motion.label>
           ))}
 
           {/* Other Option */}
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
+            initial={prefersReducedMotion ? false : { opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.5 + randomizedReasons.length * 0.1 }}
+            transition={{ delay: prefersReducedMotion ? 0 : 0.5 + randomizedReasons.length * 0.1 }}
           >
-            <button
-              onClick={() => handleReasonSelect('other')}
-              className={`w-full p-4 text-left rounded-lg border-2 transition-all duration-200 ${
-                selectedReason === 'other'
+            <label
+              className={`w-full block p-4 text-left rounded-lg border-2 transition-all duration-200 cursor-pointer ${
+                selectedReason === 'OTHER'
                   ? 'border-cc360-primary bg-cc360-primary/10 text-cc360-blue'
                   : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
               }`}
             >
+              <input
+                type="radio"
+                name="reason"
+                value="OTHER"
+                checked={selectedReason === 'OTHER'}
+                onChange={() => handleReasonSelect('OTHER')}
+                className="sr-only"
+              />
               <div className="flex items-center space-x-3">
                 <div className={`w-4 h-4 rounded-full border-2 ${
-                  selectedReason === 'other'
+                  selectedReason === 'OTHER'
                     ? 'border-cc360-primary bg-cc360-primary'
                     : 'border-gray-300'
                 }`}>
-                  {selectedReason === 'other' && (
+                  {selectedReason === 'OTHER' && (
                     <div className="w-2 h-2 bg-white rounded-full mx-auto mt-0.5"></div>
                   )}
                 </div>
                 <span className="font-body font-medium">Other (type in box)</span>
               </div>
-            </button>
+            </label>
             
-            {selectedReason === 'other' && (
+            {selectedReason === 'OTHER' && (
               <motion.textarea
-                initial={{ opacity: 0, height: 0 }}
+                initial={prefersReducedMotion ? false : { opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 className="w-full mt-3 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cc360-primary focus:border-transparent font-body"
                 placeholder="Please tell us more..."
@@ -163,19 +162,19 @@ const QuickReason = () => {
               />
             )}
           </motion.div>
-        </motion.div>
+        </motion.fieldset>
 
         {/* Next Button */}
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.0 }}
+          transition={{ delay: prefersReducedMotion ? 0 : 1.0 }}
         >
           <button
             onClick={handleNext}
-            disabled={!selectedReason || (selectedReason === 'other' && !customReason.trim())}
+            disabled={!selectedReason || (selectedReason === 'OTHER' && !customReason.trim())}
             className={`w-full py-4 px-6 rounded-lg font-heading font-bold transition-all duration-200 flex items-center justify-center space-x-2 ${
-              selectedReason && (selectedReason !== 'other' || customReason.trim())
+              selectedReason && (selectedReason !== 'OTHER' || customReason.trim())
                 ? 'bg-gradient-to-r from-cc360-primary to-cc360-blue hover:from-blue-600 hover:to-cc360-blue text-white transform hover:scale-105 shadow-lg'
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             }`}
@@ -185,8 +184,7 @@ const QuickReason = () => {
           </button>
         </motion.div>
       </motion.div>
-      </div>
-    </div>
+    </CancelLayout>
   );
 };
 

@@ -1,48 +1,43 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { useCancellation } from '../context/CancellationContext';
-import ProgressBar from './ProgressBar';
-import { Heart, Play, Users, ArrowRight, ChevronLeft } from 'lucide-react';
+import CancelLayout from './CancelLayout';
+import { Heart, Play, Users, ArrowRight } from 'lucide-react';
+import { useState } from 'react';
+import { APP_URL } from '../utils/env';
+import { trackEvent, trackPage } from '../utils/analytics';
 
 const GoodbyePage = () => {
   const navigate = useNavigate();
-  const { userData, updateCancellationData } = useCancellation();
+  const { userData, updateCancellationData, updateUserData } = useCancellation();
+  const [tempLocationId, setTempLocationId] = useState(userData.locationId || '');
+  const [tempCompanyId, setTempCompanyId] = useState(userData.companyId || '');
+  const prefersReducedMotion = useReducedMotion();
+  const headingRef = useRef(null);
 
   const handleFinishCancellation = () => {
     updateCancellationData({ currentStep: 6 });
+    trackEvent('cancellation_finish_clicked');
     // This would trigger the actual Stripe cancellation
     navigate('/cancel/confirmation');
   };
 
-  const handleGoHome = () => {
-    window.location.href = 'https://app.coursecreator360.com';
-  };
+  useEffect(() => {
+    document.title = 'Cancel CC360 – Step 5';
+    trackPage('Cancellation – Step 5 (Goodbye)');
+    if (headingRef.current) headingRef.current.focus();
+  }, []);
 
   return (
-    <div className="min-h-screen p-4">
-      {/* Progress Bar */}
-      <ProgressBar currentStep={5} />
-      
-      <div className="flex items-center justify-center min-h-[calc(100vh-120px)]">
+    <CancelLayout step={5}>
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-2xl w-full bg-cc360-site-white rounded-2xl shadow-xl p-8"
         >
-        {/* Home Button */}
-        <div className="mb-6">
-          <button
-            onClick={handleGoHome}
-            className="flex items-center space-x-2 px-3 py-2 text-gray-600 hover:text-gray-800 font-body text-sm transition-all duration-200 rounded-lg hover:bg-gray-50"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            <span>Home</span>
-          </button>
-        </div>
         {/* Goodbye Icon */}
         <motion.div 
-          initial={{ scale: 0 }}
+          initial={prefersReducedMotion ? false : { scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ delay: 0.2, type: "spring" }}
           className="flex justify-center mb-6"
@@ -55,15 +50,17 @@ const GoodbyePage = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <motion.h1 
-            initial={{ opacity: 0 }}
+            initial={prefersReducedMotion ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
-            className="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-4"
+            className="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-4 focus:outline-none"
+            tabIndex={-1}
+            ref={headingRef}
           >
             We're sad to see you go, {userData.firstName} 💔
           </motion.h1>
           <motion.p 
-            initial={{ opacity: 0 }}
+            initial={prefersReducedMotion ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
             className="text-lg text-gray-600 font-subheading leading-relaxed"
@@ -86,7 +83,7 @@ const GoodbyePage = () => {
           <motion.a
             href="/case-studies/jane-5k-30-days"
             target="_blank"
-            initial={{ opacity: 0, x: -20 }}
+            initial={prefersReducedMotion ? false : { opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.6 }}
             className="flex items-center space-x-4 p-4 bg-gradient-to-r from-cc360-primary/10 to-blue-50 rounded-lg border border-cc360-primary/30 hover:border-cc360-primary/50 transition-all duration-200 cursor-pointer group"
@@ -102,7 +99,7 @@ const GoodbyePage = () => {
           <motion.a
             href="https://facebook.com/groups/cc360community"
             target="_blank"
-            initial={{ opacity: 0, x: -20 }}
+            initial={prefersReducedMotion ? false : { opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.7 }}
             className="flex items-center space-x-4 p-4 bg-gradient-to-r from-cc360-accent-lime/20 to-green-50 rounded-lg border border-cc360-accent-lime/40 hover:border-cc360-accent-lime/60 transition-all duration-200 cursor-pointer group"
@@ -118,7 +115,7 @@ const GoodbyePage = () => {
 
         {/* Fine Print */}
         <motion.div 
-          initial={{ opacity: 0 }}
+          initial={prefersReducedMotion ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
           className="bg-gray-50 rounded-lg p-4 mb-8"
@@ -128,9 +125,48 @@ const GoodbyePage = () => {
           </p>
         </motion.div>
 
+        {/* Testing: Override Location & Company IDs (auto-populated from context) */}
+        <motion.div
+          initial={prefersReducedMotion ? false : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.85 }}
+          className="bg-white rounded-lg p-4 mb-8 border border-gray-200"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={tempLocationId}
+                onChange={(e) => setTempLocationId(e.target.value)}
+                placeholder="locationId"
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-cc360-primary focus:border-transparent text-sm"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={tempCompanyId}
+                onChange={(e) => setTempCompanyId(e.target.value)}
+                placeholder="companyId"
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-cc360-primary focus:border-transparent text-sm"
+              />
+            </div>
+          </div>
+          <div className="mt-3 flex items-center gap-2">
+            <button
+              onClick={() => updateUserData({ locationId: tempLocationId, companyId: tempCompanyId })}
+              className="px-3 py-2 bg-gray-800 text-white rounded-md text-sm hover:bg-gray-900"
+            >
+              Use IDs
+            </button>
+            <p className="text-xs text-gray-500">Current: locationId <span className="font-mono">{userData.locationId || '(none)'}</span>, companyId <span className="font-mono">{userData.companyId || '(none)'}</span></p>
+          </div>
+          <p className="mt-2 text-xs text-gray-400">Tip: For testing with your token, set <span className="font-mono">VITE_LEADCONNECTOR_TOKEN</span> in env, or I can add a dev-only input to paste a token here.</p>
+        </motion.div>
+
         {/* Final CTA */}
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.9 }}
         >
@@ -142,8 +178,7 @@ const GoodbyePage = () => {
           </button>
         </motion.div>
       </motion.div>
-      </div>
-    </div>
+    </CancelLayout>
   );
 };
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 
 const ProgressBar = ({ currentStep, totalSteps = 4 }) => {
   // Map the cancellation flow steps to progress dots
@@ -17,6 +17,8 @@ const ProgressBar = ({ currentStep, totalSteps = 4 }) => {
 
   const activeStep = getActiveStep(currentStep);
   const completedSteps = activeStep - 1; // Number of fully completed steps
+
+  const prefersReducedMotion = useReducedMotion();
 
   return (
     <div className="w-full px-4 py-6">
@@ -44,9 +46,9 @@ const ProgressBar = ({ currentStep, totalSteps = 4 }) => {
                     backgroundColor: isDotActive ? '#0475FF' : '#E5E7EB'
                   }}
                   transition={{ 
-                    duration: 0.5, 
+                    duration: prefersReducedMotion ? 0 : 0.5, 
                     ease: "easeOut",
-                    delay: stepNumber === activeStep ? 0.8 : 0
+                    delay: prefersReducedMotion ? 0 : (stepNumber === activeStep ? 0.8 : 0)
                   }}
                   className={`relative w-4 h-4 rounded-full ${
                     isDotActive ? 'bg-cc360-primary' : 'bg-gray-300'
@@ -56,12 +58,12 @@ const ProgressBar = ({ currentStep, totalSteps = 4 }) => {
                   {stepNumber === activeStep && (
                     <motion.div
                       animate={{ 
-                        scale: [1, 1.3, 1],
-                        opacity: [0.5, 0.8, 0.5]
+                        scale: prefersReducedMotion ? 1 : [1, 1.3, 1],
+                        opacity: prefersReducedMotion ? 1 : [0.5, 0.8, 0.5]
                       }}
                       transition={{
-                        duration: 2,
-                        repeat: Infinity,
+                        duration: prefersReducedMotion ? 0 : 2,
+                        repeat: prefersReducedMotion ? 0 : Infinity,
                         ease: "easeInOut"
                       }}
                       className="absolute inset-0 rounded-full bg-cc360-primary opacity-50"
@@ -73,8 +75,8 @@ const ProgressBar = ({ currentStep, totalSteps = 4 }) => {
                     <motion.div
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ 
-                        duration: 0.3,
-                        delay: stepNumber === activeStep ? 0.8 : 0 
+                        duration: prefersReducedMotion ? 0 : 0.3,
+                        delay: prefersReducedMotion ? 0 : (stepNumber === activeStep ? 0.8 : 0) 
                       }}
                       className="absolute inset-0 rounded-full bg-cc360-primary opacity-30 scale-150"
                     />
@@ -91,7 +93,7 @@ const ProgressBar = ({ currentStep, totalSteps = 4 }) => {
                         width: isLineFilled ? '100%' : '0%' 
                       }}
                       transition={{ 
-                        duration: lineTargetStep === activeStep ? 0.8 : 0,
+                        duration: prefersReducedMotion ? 0 : (lineTargetStep === activeStep ? 0.8 : 0),
                         ease: "easeInOut"
                       }}
                       className="h-full bg-cc360-primary"
